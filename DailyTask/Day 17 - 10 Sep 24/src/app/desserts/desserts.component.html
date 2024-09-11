@@ -1,0 +1,90 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <ng-container *ngIf="isLogged; then logged; else login;">
+                    </ng-container>
+                    <ng-template #logged>
+                        <div class="d-flex">
+                            <div class="nav-link">Welcome user!</div>
+                            <button class="btn ms-3" (click)="logoutUser()">Logout</button>
+                        </div> 
+                    </ng-template>
+                    <ng-template #login>
+                        <div class="d-flex">
+                            <div class="nav-link">Welcome guest!</div>
+                            <button class="btn ms-3" (click)="loginUser()">Login</button>
+                        </div>
+                    </ng-template>
+                </li>
+                <li class="nav-item" *ngIf="!isAdmin && !isLogged">
+                    <button class="btn ms-3" (click)="loginAdmin()">AdminLogin</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="m-3 table-responsive">
+    <h1>Ready for your summer😊</h1>
+    <label for="typeFilter" class="form-label filter-text">Filter by Type</label>
+    <div class="d-flex justify-content-between mb-3">
+        <div class="form-group w-25">
+            <select id="typeFilter" class="form-select" [(ngModel)]="selectedType">
+                <option *ngFor="let type of uniqueTypes" [value]="type">{{ type }}</option>
+            </select>
+        </div>
+    </div>
+    
+    <table class="table table-hover table-borderless align-middle table-fixed">
+        <thead class="table-dark">
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Picture</th>
+                <th>Price</th>
+                <th>Rating</th>
+                <th *ngIf="!isAdmin && isLogged"></th>
+                <th *ngIf="isAdmin && isLogged">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let dessert of DessertList">
+                <ng-container *ngIf="selectedType === 'all' || dessert.type === selectedType">
+                    <td>{{dessert.dessertId}}</td>
+                    <td>{{dessert.dessertName}}</td>
+                    <td><img [src]="dessert.image" width="150px" height="150px"/></td>
+                    <ng-container *ngIf="dessert.stock>0; then available; else notavailable"></ng-container>
+                    <ng-template #available>
+                        <td>Rs.{{dessert.dessertPrice}}</td>
+                    </ng-template>
+                    <ng-template #notavailable>
+                        <td *ngIf="dessert.stock<=0" [ngStyle]="{'color':'red'}">Out of Stock</td>
+                    </ng-template>
+                    
+                    
+                    <td>
+                        <span [innerHTML]="generateStars(dessert.rating)" 
+                            [ngStyle]="{
+                                'color': dessert.rating! >= 4 ? 'gold' : 
+                                        dessert.rating! >= 2 ? 'silver' : 'red'
+                            }">
+                        </span>
+                    </td>
+                    <td *ngIf="!isAdmin && isLogged"><button class="btn btn-dark" [disabled]="dessert.stock<=0"(click)="display(dessert)">Add to Cart</button></td>
+                    <td *ngIf="isAdmin && isLogged">
+                        <button class="btn btn-outline-primary">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline-danger ms-2">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </ng-container>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<app-cart *ngIf="!isAdmin && isLogged" [productsInCart]="cartItems" (emptyCart)="emptyCart($event)"></app-cart>
+<app-addform (add)="addDessert($event)" *ngIf="isAdmin"></app-addform>
