@@ -1,0 +1,30 @@
+<h1 class="mb-4 text-center" [ngStyle]="{'color':'chocolate'}">Your Cart</h1>
+
+<div *ngIf="productsInCart.length > 0" class="cart-container bg-white p-3 rounded border shadow-sm w-50 mx-auto">
+
+  <h4 class="mb-3 text-center">Items in Your Cart</h4>
+
+  <ul class="list-group mb-3">
+    <li *ngFor="let product of productsInCart" class="list-group-item d-flex justify-content-between">
+      <div>
+        <strong>{{ product.dessertName }}</strong>
+        <small class="text-muted ms-2">x{{ product.count }}</small>
+      </div>
+      <span class="text-muted">Rs.{{ product.dessertPrice * product.count }}</span>
+    </li>
+  </ul>
+
+  <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+    <h5 class="m-0">Total:</h5>
+    <h5 class="text-primary m-0">Rs.{{ getTotalPrice() }}</h5>
+  </div>
+
+  <div class="text-center">
+    <button class="btn btn-primary w-100 py-2" (click)="buyNow()">Buy Now</button>
+  </div>
+  
+</div>
+
+<div *ngIf="productsInCart.length === 0" class="text-center mt-4 p-3 border border-warning rounded">
+  <p>Your cart is empty.</p>
+</div>
